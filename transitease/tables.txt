@@ -1,0 +1,147 @@
+-- Table for Employees
+CREATE TABLE employees (
+    emp_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    contact_info VARCHAR(255),
+    position VARCHAR(100) NOT NULL,
+    company_id INT NOT NULL,
+    transit_type ENUM('Bus', 'Metro') NOT NULL,
+    FOREIGN KEY (company_id) REFERENCES metro_companies(company_id) ON DELETE CASCADE
+);
+
+-- Table for Employee Salary
+CREATE TABLE emp_salary (
+    salary_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT NOT NULL,
+    salary_amount DECIMAL(10, 2) NOT NULL,
+    payment_date DATE,
+    bonus DECIMAL(10, 2) DEFAULT 0.00;
+    FOREIGN KEY (emp_id) REFERENCES employees(emp_id) ON DELETE CASCADE
+);
+
+-- Table for Employee Attendance
+CREATE TABLE emp_attendance (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT NOT NULL,
+    attendance_date DATE NOT NULL,
+    status ENUM('Present', 'Absent', 'Leave') NOT NULL,
+    FOREIGN KEY (emp_id) REFERENCES employees(emp_id) ON DELETE CASCADE
+);
+
+-- Table for Bus Income
+CREATE TABLE bus_income (
+    income_id INT AUTO_INCREMENT PRIMARY KEY,
+    bus_id INT NOT NULL,
+    date DATE NOT NULL,
+    income_amount DECIMAL(10, 2) NOT NULL,
+    company_id int,
+    FOREIGN KEY (company_id) REFERENCES bus_companies(company_id) ON DELETE CASCADE
+    FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE CASCADE
+);
+
+-- Table for Metro Income
+CREATE TABLE metro_income (
+    income_id INT AUTO_INCREMENT PRIMARY KEY,
+    train_id INT NOT NULL,
+    date DATE NOT NULL,
+    income_amount DECIMAL(10, 2) NOT NULL,
+    company_id int,
+    FOREIGN KEY (company_id) REFERENCES bus_companies(company_id) ON DELETE CASCADE
+    FOREIGN KEY (train_id) REFERENCES trains(train_id) ON DELETE CASCADE
+);
+-- Table: bus_companies
+CREATE TABLE bus_companies (
+    company_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    contact_info VARCHAR(255),
+    password VARCHAR(255),
+);
+
+-- Table: buses
+CREATE TABLE buses (
+    bus_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_name VARCHAR(100) NOT NULL,
+    company_id INT,
+    route_id INT,
+    FOREIGN KEY (company_name) REFERENCES bus_companies(name) ON DELETE SET NULL
+    FOREIGN KEY (company_id) REFERENCES bus_companies(company_id) ON DELETE CASCADE,
+    FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE SET NULL
+);
+
+-- Table: routes
+CREATE TABLE routes (
+    route_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    company_id INT,
+    FOREIGN KEY (company_id) REFERENCES bus_companies(company_id) ON DELETE CASCADE
+);
+
+-- Table: stops
+CREATE TABLE stops (
+    stop_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    route_id INT,
+    stop_number INT,
+    FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE CASCADE
+);
+
+-- Table: metro_companies
+CREATE TABLE metro_companies (
+    company_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    contact_info VARCHAR(255),
+    password VARCHAR(255),
+);
+
+-- Table: metro_routes
+CREATE TABLE metro_routes (
+    route_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    company_id INT,
+    FOREIGN KEY (company_id) REFERENCES metro_companies(company_id) ON DELETE CASCADE
+);
+
+-- Table: metro_stops
+CREATE TABLE metro_stops (
+    stop_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    route_id INT,
+    stop_number INT,
+    FOREIGN KEY (route_id) REFERENCES metro_routes(route_id) ON DELETE CASCADE
+);
+
+-- Table: trains
+CREATE TABLE trains (
+    train_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_name VARCHAR(100) NOT NULL,
+    route_id INT,
+    company_id INT,
+    FOREIGN KEY (route_id) REFERENCES metro_routes(route_id) ON DELETE SET NULL,
+    FOREIGN KEY (company_id) REFERENCES metro_companies(company_id) ON DELETE CASCADE
+);
+CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    start_stop VARCHAR(255) NOT NULL,
+    end_stop VARCHAR(255) NOT NULL,
+    fare DECIMAL(10, 2) NULL,
+    transit_company VARCHAR(50) NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(100) NULL,
+    password VARCHAR(255) NULL,
+    role ENUM('user','admin') DEFAULT 'user' NULL
+);
+CREATE TABLE payment (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    payment_date date set NULL,
+    bonus decimal,
+    bonus_added_date date,
+    emp_id;
+    FOREIGN KEY (emp_id) REFERENCES employees(emp_id) ON DELETE CASCADE
+);
+
